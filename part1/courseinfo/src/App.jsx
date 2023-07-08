@@ -1,52 +1,47 @@
-const Header = (props) => {
-  // console.log(props);
-  return <p>{props.courseTitle}</p>;
+const Header = ({ course }) => {
+  return <h1>{course}</h1>;
 };
-const Content = ({ ...props }) => {
-  //console.log(props.part1.name);
-  return (
-    <>
-      <p>
-        {props.part1.name} {props.part1.exercises}
-      </p>
-      <p>
-        {props.part2.name} {props.part2.exercises}
-      </p>
-      <p>
-        {props.part3.name} {props.part3.exercises}
-      </p>
-    </>
-  );
+const Content = ({ parts }) => {
+  //console.log(parts);
+  const contents = parts.map((part, index) => (
+    <p key={index}>
+      {part.name} {part.exercises}
+    </p>
+  ));
+  return contents;
 };
-const Total = ({ totalExercises }) => {
-  console.log(totalExercises);
-  return <p>Number of exercises is {totalExercises}</p>;
+const Total = ({ parts }) => {
+  const eachExercise = parts.map((part) => part.exercises);
+  //console.log(eachExercise);
+  const totalSum = eachExercise.reduce((acc, value) => acc + value, 0);
+  return <p>Number of exercise {totalSum}</p>;
 };
 
 const App = () => {
   const course = "Half Stack application development";
-  const part1 = {
-    name: "Fundamentals of React",
-    exercises: 10,
-  };
-  const part2 = {
-    name: "Using props to pass data",
-    exercises: 7,
-  };
-  const part3 = {
-    name: "State of a component",
-    exercises: 14,
-  };
-
-  const sum = part1.exercises + part2.exercises + part3.exercises;
-  //console.log(sum);
+  const parts = [
+    {
+      name: "Fundamentals of React",
+      exercises: 10,
+    },
+    {
+      name: "Using props to pass data",
+      exercises: 7,
+    },
+    {
+      name: "State of a component",
+      exercises: 14,
+    },
+  ];
 
   return (
-    <div>
-      <Header courseTitle={course} />
-      <Content part1={part1} part2={part2} part3={part3} />
-      <Total totalExercises={sum} />
-    </div>
+    <>
+      <div>
+        <Header course={course} />
+        <Content parts={parts} />
+        <Total parts={parts} />
+      </div>
+    </>
   );
 };
 
