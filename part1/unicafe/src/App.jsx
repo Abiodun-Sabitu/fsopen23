@@ -4,21 +4,14 @@ const Button = ({ btnName, feedback }) => {
   return <button onClick={feedback}>{btnName}</button>;
 };
 
-const Statistics = (props) => {
-  const stats = [].concat(props);
-  console.log(stats);
-  return stats.map((stat, index) => {
-    return (
-      <div key={index}>
-        <p>Good: {stat.good}</p>
-        <p>Neutral: {stat.neutral}</p>
-        <p>Bad: {stat.bad}</p>
-        <p>All: {stat.all}</p>
-        <p>Average: {stat.average}</p>
-        <p>Positive Percentage: {stat.positivePercentage} %</p>
-      </div>
-    );
-  });
+const StatisticLine = ({ text, value }) => {
+  //console.log(text, value);
+  return (
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
+  );
 };
 
 const App = () => {
@@ -50,14 +43,26 @@ const App = () => {
       <Button btnName="Neutral" feedback={handleNeutralClick} />
       <Button btnName="Bad" feedback={handleBadClick} />
       <h1>Statistics</h1>
-      <Statistics
-        good={good}
-        neutral={neutral}
-        bad={bad}
-        all={totalFeedback}
-        average={average}
-        positivePercentage={positives}
-      />
+      {/* show stats only when feedback has been given */}
+      {totalFeedback === 0 ? (
+        <p>No feedback given</p>
+      ) : (
+        <>
+          <table>
+            <tbody>
+              <StatisticLine text="Good" value={good} />
+              <StatisticLine text="Neutral" value={neutral} />
+              <StatisticLine text="Bad" value={bad} />
+              <StatisticLine text="All" value={totalFeedback} />
+              <StatisticLine text="Average" value={`${average.toFixed(1)}`} />
+              <StatisticLine
+                text="PositivePercentage"
+                value={`${positives.toFixed(1)} %`}
+              />
+            </tbody>
+          </table>
+        </>
+      )}
     </div>
   );
 };
