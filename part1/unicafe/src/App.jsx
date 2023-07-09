@@ -1,7 +1,24 @@
 import { useState } from "react";
-const Button = ({ ...props }) => {
-  console.log(props.feedback);
-  return <button onClick={props.feedback}>{props.btnName}</button>;
+const Button = ({ btnName, feedback }) => {
+  //console.log(btnName, feedback);
+  return <button onClick={feedback}>{btnName}</button>;
+};
+
+const Statistics = (props) => {
+  const stats = [].concat(props);
+  console.log(stats);
+  return stats.map((stat, index) => {
+    return (
+      <div key={index}>
+        <p>Good: {stat.good}</p>
+        <p>Neutral: {stat.neutral}</p>
+        <p>Bad: {stat.bad}</p>
+        <p>All: {stat.all}</p>
+        <p>Average: {stat.average}</p>
+        <p>Positive Percentage: {stat.positivePercentage} %</p>
+      </div>
+    );
+  });
 };
 
 const App = () => {
@@ -10,6 +27,7 @@ const App = () => {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
 
+  // Button functions passed as props
   const handleGoodClick = () => {
     return setGood(good + 1);
   };
@@ -20,6 +38,11 @@ const App = () => {
     return setBad(bad + 1);
   };
 
+  // Computation for total, average and positive percentage numbers of feedbacks received
+  const totalFeedback = good + neutral + bad;
+  const average = totalFeedback / 3;
+  const positives = totalFeedback === 0 ? 0 : (good / totalFeedback) * 100;
+
   return (
     <div>
       <h1>Give Feedback</h1>
@@ -27,9 +50,14 @@ const App = () => {
       <Button btnName="Neutral" feedback={handleNeutralClick} />
       <Button btnName="Bad" feedback={handleBadClick} />
       <h1>Statistics</h1>
-      <p>Good {good}</p>
-      <p>Neutral {neutral}</p>
-      <p>Bad {bad}</p>
+      <Statistics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        all={totalFeedback}
+        average={average}
+        positivePercentage={positives}
+      />
     </div>
   );
 };
