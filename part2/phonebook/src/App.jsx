@@ -9,19 +9,30 @@ const App = () => {
     return setNewName(e.target.value);
   };
 
-  // add new person operation
-  // console.log(persons.concat({ name: newName }));
-  const addPerson = () => {
-    setPersons([...persons, { name: newName }]);
-    setNewName("");
-  };
-  //console.log(persons);
-
   //name of person
   const contactNames = persons.map((person, index) => (
     <p key={index}>{person.name}</p>
   ));
   //console.log(contactNames);
+
+  // add new person operation and empty field and duplicity validation
+  // console.log(persons.concat({ name: newName }));
+  const addPerson = () => {
+    const arr = persons.map((person, index) => person.name);
+    console.log(arr);
+    const isDuplicated = arr.includes(newName);
+    console.log(isDuplicated);
+    if (isDuplicated) {
+      alert(`${newName} is already added to the phonebook`);
+      setNewName("");
+    } else if (newName === "") {
+      alert(`You cannot add a blank contact`);
+    } else {
+      setPersons([...persons, { name: newName }]);
+      setNewName("");
+    }
+  };
+  //console.log(persons);
 
   return (
     <div>
