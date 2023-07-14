@@ -1,38 +1,60 @@
 import { useState } from "react";
 
 const App = () => {
-  const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
+  const [persons, setPersons] = useState([
+    { name: "Arto Hellas", phone: "040 - 1234567", id: 0 },
+  ]);
   const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [idCounter, setIdCounter] = useState(1);
 
-  // newName state connected to hold the input from user
+  const newContact = {
+    name: newName,
+    phone: newNumber,
+    id: idCounter,
+  };
+  //console.log(newContact);
+
   const handleUserInput = (e) => {
-    return setNewName(e.target.value);
+    const inputElementName = e.target.name;
+    const inputElementValue = e.target.value;
+    if (inputElementName === "contactName") {
+      setNewName(inputElementValue);
+    } else if (inputElementName === "contactTel") {
+      setNewNumber(inputElementValue);
+    }
   };
 
   //name of person
-  const contactNames = persons.map((person, index) => (
-    <p key={index}>{person.name}</p>
+  const contactNames = persons.map((person) => (
+    <p key={person.id}>
+      {person.name} {person.phone}
+    </p>
   ));
   //console.log(contactNames);
 
-  // add new person operation and empty field and duplicity validation
-  // console.log(persons.concat({ name: newName }));
   const addPerson = () => {
-    const arr = persons.map((person, index) => person.name);
-    console.log(arr);
-    const isDuplicated = arr.includes(newName);
-    console.log(isDuplicated);
+    const isDuplicated = persons.some(
+      (person) => person.name === newName && person.phone === newNumber
+    );
+
     if (isDuplicated) {
-      alert(`${newName} is already added to the phonebook`);
-      setNewName("");
-    } else if (newName === "") {
-      alert(`You cannot add a blank contact`);
-    } else {
-      setPersons([...persons, { name: newName }]);
-      setNewName("");
+      alert(
+        `Either ${newName} or ${newNumber} or both parameters are already added to the phonebook`
+      );
+      return;
     }
+
+    if (newName === "" || newNumber === "") {
+      alert(`You cannot add a blank contact`);
+      return;
+    }
+
+    setPersons([...persons, newContact]);
+    setIdCounter(idCounter + 1);
+    setNewName("");
+    setNewNumber("");
   };
-  //console.log(persons);
 
   return (
     <div>
@@ -43,7 +65,20 @@ const App = () => {
         }}
       >
         <div>
-          name: <input value={newName} onChange={handleUserInput} />
+          name:{" "}
+          <input
+            name="contactName"
+            value={newName}
+            onChange={handleUserInput}
+          />
+          <br /> <br />
+          number:
+          <input
+            name="contactTel"
+            value={newNumber}
+            onChange={handleUserInput}
+            type="tel"
+          />
         </div>
         <div>
           <button type="submit" onClick={addPerson}>
@@ -53,7 +88,6 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <div>{contactNames}</div>
-      ...
     </div>
   );
 };
