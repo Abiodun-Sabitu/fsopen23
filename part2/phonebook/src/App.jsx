@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Filter from "./component/Filter";
+import PersonForm from "./component/PersonForm";
+import Persons from "./component/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -7,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [idCounter, setIdCounter] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
 
   const newContact = {
     name: newName,
@@ -25,8 +29,11 @@ const App = () => {
     }
   };
 
+  const filteredPersons = persons.filter((person) =>
+    person.name.toLowerCase().includes(searchInput.toLowerCase())
+  );
   //name of person
-  const contactNames = persons.map((person) => (
+  const contactNames = filteredPersons.map((person) => (
     <p key={person.id}>
       {person.name} {person.phone}
     </p>
@@ -56,38 +63,23 @@ const App = () => {
     setNewNumber("");
   };
 
+  const handleSearch = (e) => {
+    setSearchInput(e.target.value);
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
-        <div>
-          name:{" "}
-          <input
-            name="contactName"
-            value={newName}
-            onChange={handleUserInput}
-          />
-          <br /> <br />
-          number:
-          <input
-            name="contactTel"
-            value={newNumber}
-            onChange={handleUserInput}
-            type="tel"
-          />
-        </div>
-        <div>
-          <button type="submit" onClick={addPerson}>
-            add
-          </button>
-        </div>
-      </form>
+      <Filter searchInput={searchInput} handleSearch={handleSearch} />
+      <h2>add new</h2>
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        newNumber={newNumber}
+        handleUserInput={handleUserInput}
+      />
       <h2>Numbers</h2>
-      <div>{contactNames}</div>
+      <Persons contactNames={contactNames} />
     </div>
   );
 };
