@@ -1,10 +1,10 @@
 const Filter = ({ searchInput, handleSearch }) => {
-  // console.log(props);
   return (
-    <>
-      Filter by contact name:
+    <div>
+      Search: <br />
       <input type="search" value={searchInput} onChange={handleSearch} />
-    </>
+    </div>
   );
 };
+
 export default Filter;

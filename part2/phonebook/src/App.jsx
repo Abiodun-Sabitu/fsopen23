@@ -1,85 +1,103 @@
-import { useState } from "react";
-import Filter from "./component/Filter";
-import PersonForm from "./component/PersonForm";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Persons from "./component/Persons";
+import PersonForm from "./component/PersonForm";
+import Filter from "./component/Filter";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", phone: "040 - 1234567", id: 0 },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-  const [idCounter, setIdCounter] = useState(1);
   const [searchInput, setSearchInput] = useState("");
 
-  const newContact = {
-    name: newName,
-    phone: newNumber,
-    id: idCounter,
-  };
-  //console.log(newContact);
+  //useEffect fetches data and fulfilled promise from JSONserver
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((response) => {
+      const savedContacts = response.data;
+      setPersons(savedContacts); //fetched data is then passed to the persons States.
+    });
+  }, []);
 
-  const handleUserInput = (e) => {
-    const inputElementName = e.target.name;
-    const inputElementValue = e.target.value;
-    if (inputElementName === "contactName") {
-      setNewName(inputElementValue);
-    } else if (inputElementName === "contactTel") {
-      setNewNumber(inputElementValue);
-    }
-  };
+  // search filter operation
+  const phoneBook =
+    searchInput.trim() === ""
+      ? persons // Return the entire array when searchInput is empty
+      : persons.filter((person) =>
+          person.name.toLowerCase().includes(searchInput.toLowerCase())
+        );
 
-  const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(searchInput.toLowerCase())
-  );
-  //name of person
-  const contactNames = filteredPersons.map((person) => (
-    <p key={person.id}>
-      {person.name} {person.phone}
-    </p>
-  ));
-  //console.log(contactNames);
+  //console.log(phoneBook);
 
-  const addPerson = () => {
-    const isDuplicated = persons.some(
-      (person) => person.name === newName && person.phone === newNumber
-    );
-
-    if (isDuplicated) {
-      alert(
-        `Either ${newName} or ${newNumber} or both parameters are already added to the phonebook`
-      );
-      return;
-    }
-
-    if (newName === "" || newNumber === "") {
-      alert(`You cannot add a blank contact`);
-      return;
-    }
-
-    setPersons([...persons, newContact]);
-    setIdCounter(idCounter + 1);
-    setNewName("");
-    setNewNumber("");
-  };
-
+  //Search field control 2 way binding
   const handleSearch = (e) => {
-    setSearchInput(e.target.value);
+    const searchParameter = e.target.value;
+    setSearchInput(searchParameter);
+  };
+
+  //user input operations are defined here for the form controls
+  const handleUserInputs = (e) => {
+    const inputName = e.target.name;
+    const inputValue = e.target.value;
+    if (inputName === "contactsName") {
+      setNewName(inputValue);
+    } else if (inputName === "contactsNumber") {
+      setNewNumber(inputValue);
+    }
+  };
+
+  //defining the newPerson payload
+  const newPerson = {
+    name: newName,
+    number: newNumber,
+  };
+
+  // console.log(newPerson);
+
+  //Adding new contact operation
+  const addPerson = (e) => {
+    e.preventDefault();
+    //duplicate checker operation
+    const isDuplicated = persons.some(
+      (person) =>
+        person.name === newPerson.name && person.number === newPerson.number
+    );
+    console.log(isDuplicated);
+
+    // Logical conditionals to interact with user
+    if (newName === "" || newName === "") {
+      alert("you cannot add a empty contact");
+    } else if (isDuplicated) {
+      alert(
+        `Either ${newName} or ${newNumber} already exists on the phone book`
+      );
+      setNewName("");
+      setNewNumber("");
+    } else {
+      //post request carrying the new person payload;
+      axios
+        .post(" http://localhost:3001/persons", newPerson)
+        .then((response) => {
+          //console.log(response.data);
+          setPersons([...persons, response.data]);
+          setNewName("");
+          setNewNumber("");
+        });
+    }
   };
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>My PhoneBook</h1>
       <Filter searchInput={searchInput} handleSearch={handleSearch} />
-      <h2>add new</h2>
+      <h3>Add New</h3>
       <PersonForm
-        addPerson={addPerson}
         newName={newName}
         newNumber={newNumber}
-        handleUserInput={handleUserInput}
+        handleUserInputs={handleUserInputs}
+        addPerson={addPerson}
       />
-      <h2>Numbers</h2>
-      <Persons contactNames={contactNames} />
+      <h3>Numbers</h3>
+      <Persons phoneBook={phoneBook} />
     </div>
   );
 };
