@@ -3,7 +3,9 @@ import axios from "axios";
 import Persons from "./component/Persons";
 import PersonForm from "./component/PersonForm";
 import Filter from "./component/Filter";
+import phoneServices from "./api/phoneServices";
 
+// console.log(phoneServices.getAll());
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
@@ -12,10 +14,7 @@ const App = () => {
 
   //useEffect fetches data and fulfilled promise from JSONserver
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      const savedContacts = response.data;
-      setPersons(savedContacts); //fetched data is then passed to the persons States.
-    });
+    phoneServices.getAll().then((savedContacts) => setPersons(savedContacts)); //fetched data is then passed to the persons States.
   }, []);
 
   // search filter operation
@@ -61,7 +60,7 @@ const App = () => {
       (person) =>
         person.name === newPerson.name && person.number === newPerson.number
     );
-    console.log(isDuplicated);
+    //console.log(isDuplicated);
 
     // Logical conditionals to interact with user
     if (newName === "" || newName === "") {
@@ -73,15 +72,13 @@ const App = () => {
       setNewName("");
       setNewNumber("");
     } else {
-      //post request carrying the new person payload;
-      axios
-        .post(" http://localhost:3001/persons", newPerson)
-        .then((response) => {
-          //console.log(response.data);
-          setPersons([...persons, response.data]);
-          setNewName("");
-          setNewNumber("");
-        });
+      // Post new contact to the server and then re-render phone book
+      phoneServices.create(newPerson).then((newPerson) => {
+        console.log(newPerson);
+        setPersons([...persons, newPerson]);
+        setNewName("");
+        setNewNumber("");
+      });
     }
   };
 
