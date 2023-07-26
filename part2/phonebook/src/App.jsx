@@ -4,6 +4,7 @@ import Persons from "./component/Persons";
 import PersonForm from "./component/PersonForm";
 import Filter from "./component/Filter";
 import phoneServices from "./api/phoneServices";
+import Notification from "./component/Notification";
 
 // console.log(phoneServices.getAll());
 const App = () => {
@@ -11,6 +12,12 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  // const [notification, setNotification] = useState({
+  //   contactAdded: false,
+  //   contactDeleted: false,
+  //   numberUpdated: false,
+  // });
+  //contactAdded, contactDeleted, numberUpdated;
 
   //useEffect fetches data and fulfilled promise from JSONserver
   useEffect(() => {
@@ -112,7 +119,14 @@ const App = () => {
       phoneServices.create(newPerson).then((newPerson) => {
         console.log(newPerson);
         setPersons([...persons, newPerson]);
-        setNewName("");
+        setNotification({ ...notification, contactAdded: true });
+        setTimeout(() => {
+          setNotification({ ...notification, contactAdded: false });
+        }, 2500);
+        notification.contactAdded === true
+          ? setNewName("")
+          : setNewName(newName);
+
         setNewNumber("");
       });
     }
@@ -136,6 +150,7 @@ const App = () => {
   return (
     <div>
       <h1>My PhoneBook</h1>
+      <Notification notification={notification} newName={newName} />
       <Filter searchInput={searchInput} handleSearch={handleSearch} />
       <h3>Add New</h3>
       <PersonForm
