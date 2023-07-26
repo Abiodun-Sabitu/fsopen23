@@ -5,7 +5,7 @@ h1 {
 
 .error {
   color: red;
-  background: lightgrey;
+  background: #fc86863c;
   font-size: 20px;
   border-style: solid;
   border-radius: 5px;

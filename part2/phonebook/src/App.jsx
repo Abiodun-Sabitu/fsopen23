@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+//import axios from "axios";
 import Persons from "./component/Persons";
 import PersonForm from "./component/PersonForm";
 import Filter from "./component/Filter";
@@ -12,11 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  // const [notification, setNotification] = useState({
-  //   contactAdded: false,
-  //   contactDeleted: false,
-  //   numberUpdated: false,
-  // });
+  const [notification, setNotification] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   //contactAdded, contactDeleted, numberUpdated;
 
   //useEffect fetches data and fulfilled promise from JSONserver
@@ -107,6 +104,8 @@ const App = () => {
                 person.id === updatedPerson.id ? updatedPerson : person
               )
             );
+            setNotification(`${updatedPerson.name}'s phone number updated`);
+            setTimeout(() => setNotification(null), 3800);
             setNewName("");
             setNewNumber("");
           })
@@ -117,16 +116,13 @@ const App = () => {
     } else {
       // Post new contact to the server and then re-render phone book
       phoneServices.create(newPerson).then((newPerson) => {
-        console.log(newPerson);
+        //console.log(newPerson);
         setPersons([...persons, newPerson]);
-        setNotification({ ...notification, contactAdded: true });
+        setNotification(`Added ${newName}`);
         setTimeout(() => {
-          setNotification({ ...notification, contactAdded: false });
-        }, 2500);
-        notification.contactAdded === true
-          ? setNewName("")
-          : setNewName(newName);
-
+          setNotification(null);
+        }, 3800);
+        setNewName("");
         setNewNumber("");
       });
     }
@@ -138,19 +134,49 @@ const App = () => {
     if (window.confirm(`Delete ${name}?`)) {
       phoneServices
         .remove(id)
-        .then(setPersons(persons.filter((person) => person.id !== id)))
+        .then(() => {
+          if (errorMessage === null) {
+            setPersons(persons.filter((person) => person.id !== id)),
+              console.log(errorMessage),
+              setNotification(`${name} deleted`),
+              setTimeout(() => {
+                setNotification(null);
+              }, 3800);
+          }
+        })
         .catch((error) => {
-          "Error deleting person:", error;
+          //console.log("Error deleting person:", error);
+          setErrorMessage({
+            message: `Information of ${name} has already been removed from the server`,
+            error: error,
+          });
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 3800);
+          setPersons([...persons]);
         });
     } else {
       return;
     }
   };
 
+  const errorStyle = {
+    color: "red",
+    background: "#fc86863c",
+    fontSize: "16px",
+    borderStyle: "solid",
+    borderRadius: "5px",
+    padding: "10px",
+    marginBottom: "10px",
+  };
+
   return (
     <div>
       <h1>My PhoneBook</h1>
-      <Notification notification={notification} newName={newName} />
+      <Notification notification={notification} />
+
+      {errorMessage && <p style={errorStyle}>{errorMessage.message}</p>}
+
       <Filter searchInput={searchInput} handleSearch={handleSearch} />
       <h3>Add New</h3>
       <PersonForm
