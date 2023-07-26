@@ -17,7 +17,7 @@ const App = () => {
     phoneServices.getAll().then((savedContacts) => setPersons(savedContacts)); //fetched data is then passed to the persons States.
   }, []);
 
-  // search filter operation
+  // search filter operation with syntactic sugar
   const phoneBook =
     searchInput.trim() === ""
       ? persons // Return the entire array when searchInput is empty
