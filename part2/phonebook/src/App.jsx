@@ -27,7 +27,7 @@ const App = () => {
 
   //console.log(phoneBook);
 
-  //Search field control 2 way binding
+  //Search field control for 2 way binding
   const handleSearch = (e) => {
     const searchParameter = e.target.value;
     setSearchInput(searchParameter);
