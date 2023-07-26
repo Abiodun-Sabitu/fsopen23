@@ -62,7 +62,7 @@ const App = () => {
     );
     //console.log(isDuplicated);
 
-    // Logical conditionals to interact with user if empty fields were added
+    // Logical conditionals to interact with user if empty fields were to be added
     if (newName.trim() === "" || newNumber.trim() === "") {
       alert("you cannot add a empty contact");
       return;
