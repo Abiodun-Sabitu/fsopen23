@@ -1,15 +1,15 @@
 import SearchField from "./component/SearchField";
 import "./index.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { searchCountries } from "./api";
 import CountryList from "./component/CountryList";
-import AboutCountry from "./component/AboutCountry";
+import BasicDetails from "./component/BasicDetails";
+import FullDetails from "./component/FullDetails";
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [countries, setCountries] = useState([]);
-  const [selectedCountryIndex, setSelectedCountryIndex] = useState(-1);
+  const [selectedCountry, setSelectedCountry] = useState([]);
 
   //bind search field here
   const handleUserInput = (e) => {
@@ -28,11 +28,29 @@ const App = () => {
         });
     } else {
       setCountries([]);
+      setSelectedCountry([]);
     }
   }, [searchQuery]);
 
   const prompt = `Too many matches, specify another filter`;
   const notFound = `Error fetching data, please check your query`;
+  //console.log(selectedCountry);
+  let content;
+
+  if (countries.length > 1 && countries.length <= 10) {
+    content = (
+      <CountryList
+        countries={countries}
+        setSelectedCountry={setSelectedCountry}
+      />
+    );
+  } else if (countries.length === 1) {
+    content = <BasicDetails countries={countries} />;
+  }
+
+  if (selectedCountry.length > 0) {
+    content = <FullDetails selectedCountry={selectedCountry} />;
+  }
 
   return (
     <>
@@ -40,10 +58,7 @@ const App = () => {
         searchQuery={searchQuery}
         handleUserInput={handleUserInput}
       />
-
-      <CountryList countries={countries} />
-
-      {/* <AboutCountry about={about} /> */}
+      {content}
     </>
   );
 };
