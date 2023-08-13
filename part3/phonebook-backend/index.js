@@ -24,15 +24,23 @@ const phoneBook = [
   },
 ];
 
-app.get("/", (request, respond) => {
-  respond.send("hello world");
+app.get("/", (request, response) => {
+  response.send("hello world");
 });
 
-app.get("/api/persons", (request, respond) => {
-  respond.json(phoneBook);
+app.get("/api/persons", (request, response) => {
+  response.json(phoneBook);
+});
+
+app.get("/info", (request, response) => {
+  const currentTime = new Date();
+  const feedback = `<h2>The phone book has info for ${phoneBook.length} people</h2> <h2>${currentTime}</h2>`;
+  response.send(feedback);
 });
 
 const PORT = 3002;
 app.listen(PORT, () => {
   console.log("listening on port");
 });
+
+console.log("hello");
