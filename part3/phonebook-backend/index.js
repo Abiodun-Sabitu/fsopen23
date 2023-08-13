@@ -32,6 +32,15 @@ app.get("/api/persons", (request, response) => {
   response.json(phoneBook);
 });
 
+app.get("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  const contact = phoneBook.find((person) => person.id === id);
+  if (contact) {
+    response.json(contact);
+  }
+  response.status(404).end();
+});
+
 app.get("/info", (request, response) => {
   const currentTime = new Date();
   const feedback = `<h2>The phone book has info for ${phoneBook.length} people</h2> <h2>${currentTime}</h2>`;
