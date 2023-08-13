@@ -1,4 +1,5 @@
 const express = require("express");
+
 const app = express();
 
 const phoneBook = [
@@ -35,10 +36,17 @@ app.get("/api/persons", (request, response) => {
 app.get("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   const contact = phoneBook.find((person) => person.id === id);
+
   if (contact) {
     response.json(contact);
   }
   response.status(404).end();
+});
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  phoneBook.filter((contact) => contact.id !== id);
+  response.status(204).end();
 });
 
 app.get("/info", (request, response) => {
@@ -51,5 +59,3 @@ const PORT = 3002;
 app.listen(PORT, () => {
   console.log("listening on port");
 });
-
-console.log("hello");
