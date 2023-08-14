@@ -1,8 +1,9 @@
 const express = require("express");
 
 const app = express();
+app.use(express.json());
 
-const phoneBook = [
+let phoneBook = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -25,6 +26,10 @@ const phoneBook = [
   },
 ];
 
+const getRandomId = () => {
+  return Math.floor(Math.random() * 587) + 5;
+};
+
 app.get("/", (request, response) => {
   response.send("hello world");
 });
@@ -45,7 +50,9 @@ app.get("/api/persons/:id", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
-  phoneBook.filter((contact) => contact.id !== id);
+  const cleanedPhoneBook = phoneBook.filter((contact) => contact.id !== id);
+  phoneBook = cleanedPhoneBook;
+  console.log(phoneBook);
   response.status(204).end();
 });
 
@@ -53,6 +60,33 @@ app.get("/info", (request, response) => {
   const currentTime = new Date();
   const feedback = `<h2>The phone book has info for ${phoneBook.length} people</h2> <h2>${currentTime}</h2>`;
   response.send(feedback);
+});
+
+app.post("/api/persons", (request, response) => {
+  const postedReq = request.body;
+
+  const nameAlreadyExits = phoneBook.some(
+    (contact) => contact.name === postedReq.name
+  );
+
+  // console.log(nameAlreadyExits, postedReq);
+
+  if (!postedReq.name || !postedReq.number) {
+    return response.status(406).end("error:content is missing");
+  }
+
+  if (nameAlreadyExits) {
+    return response.status(406).end("error:name must be unique");
+  } else {
+    const updateReq = {
+      id: getRandomId(),
+      name: postedReq.name,
+      number: postedReq.number,
+    };
+
+    const updatedReq = [...phoneBook, updateReq];
+    response.json(updatedReq);
+  }
 });
 
 const PORT = 3002;
