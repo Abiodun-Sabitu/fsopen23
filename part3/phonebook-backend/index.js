@@ -1,7 +1,27 @@
 const express = require("express");
-
 const app = express();
 app.use(express.json());
+
+const morgan = require("morgan");
+// Custom format function that includes the request body if available in JSON format
+const customLogger = function (tokens, req, res) {
+  const requestBody = req.body !== undefined ? JSON.stringify(req.body) : "-";
+
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, "content-length"),
+    "-",
+    tokens["response-time"](req, res),
+    "ms",
+
+    requestBody, // Log the request body here
+  ].join(" ");
+};
+
+// Use the custom logger with Morgan middleware
+app.use(morgan(customLogger));
 
 let phoneBook = [
   {
@@ -64,7 +84,6 @@ app.get("/info", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const postedReq = request.body;
-
   const nameAlreadyExits = phoneBook.some(
     (contact) => contact.name === postedReq.name
   );
